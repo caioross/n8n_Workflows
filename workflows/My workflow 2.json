@@ -1,0 +1,212 @@
+{
+  "active": false,
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HubSpot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "n8n Form Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HubSpot": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-10-17T11:46:58.676Z",
+  "id": "0748L29rG8jnwCQ4",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "formulario",
+        "formTitle": "Teste",
+        "formDescription": "Desc",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Onde",
+              "placeholder": "Lugar"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c0b3cee2-459c-4a6f-aefe-357df7f7f8a7",
+      "name": "n8n Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.1,
+      "position": [
+        -40,
+        260
+      ],
+      "webhookId": "9012ac51-e793-4a2c-9ba4-7fd49a2f8cb9"
+    },
+    {
+      "parameters": {
+        "authentication": "appToken",
+        "resource": "deal",
+        "operation": "search",
+        "limit": 1,
+        "filterGroupsUi": {
+          "filterGroupsValues": [
+            {
+              "filtersUi": {
+                "filterValues": [
+                  {
+                    "propertyName": "hs_object_id",
+                    "value": "21054457680"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "properties": [
+            "dealname",
+            "services_produto"
+          ]
+        }
+      },
+      "id": "afeea616-4390-4643-999d-20e70578fd30",
+      "name": "HubSpot",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.1,
+      "position": [
+        440,
+        260
+      ],
+      "credentials": {
+        "hubspotAppToken": {
+          "id": "wLXevnLOUj137fM2",
+          "name": "HubSpot App Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "169c553a-fb96-44c3-9929-5e0299d5a328",
+              "name": "id",
+              "value": "21054457680",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "20d5c582-89e3-4702-a892-2103d855717b",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "3d05bb2a-2335-423e-9d27-480b2954f43f",
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        660,
+        260
+      ]
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "createdAt": "2024-10-17T11:46:58.676Z",
+      "updatedAt": "2024-10-17T11:46:58.676Z",
+      "role": "workflow:owner",
+      "workflowId": "0748L29rG8jnwCQ4",
+      "projectId": "BbalulLcG5rqgvFJ",
+      "project": {
+        "createdAt": "2024-06-10T18:18:03.245Z",
+        "updatedAt": "2024-06-10T18:18:03.245Z",
+        "id": "BbalulLcG5rqgvFJ",
+        "name": "MALCON VIVARELLI SILVA <mvsilva@padtec.com.br>",
+        "type": "personal",
+        "icon": null,
+        "projectRelations": [
+          {
+            "createdAt": "2024-06-10T18:18:03.245Z",
+            "updatedAt": "2024-06-10T18:18:03.245Z",
+            "role": "project:personalOwner",
+            "userId": "a9909e32-26ff-472d-956b-0d491ff8ae04",
+            "projectId": "BbalulLcG5rqgvFJ",
+            "user": {
+              "createdAt": "2024-05-31T19:30:31.891Z",
+              "updatedAt": "2024-08-08T16:46:15.990Z",
+              "id": "a9909e32-26ff-472d-956b-0d491ff8ae04",
+              "email": "mvsilva@padtec.com.br",
+              "firstName": "MALCON VIVARELLI",
+              "lastName": "SILVA",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2024-05-31T19:31:18.544Z",
+                "personalization_survey_n8n_version": "1.42.1"
+              },
+              "settings": {
+                "isOnboarded": true,
+                "userActivated": true,
+                "userActivatedAt": 1721678428499,
+                "firstSuccessfulWorkflowId": "uJYj0C8HAGSVdduN",
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1723135580263
+                }
+              },
+              "role": "global:owner",
+              "disabled": false,
+              "mfaEnabled": false,
+              "isPending": false,
+              "isOwner": true
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 2,
+  "updatedAt": "2024-11-21T12:22:18.905Z",
+  "versionId": "5262b7ee-7b49-41bb-85dd-4a7fbcb09fe8"
+}

@@ -1,0 +1,475 @@
+{
+  "id": 3829,
+  "name": "Web Search Assistant with Citations using SearchAPI and OpenRouter LLM",
+  "views": 0,
+  "recentViews": 0,
+  "totalViews": 0,
+  "createdAt": "2025-05-02T04:16:38.453Z",
+  "description": "## 🤖 AI Agent Web Search using SearchAPI & LLM\n\n### Who is this for?\n\nThis workflow is ideal for anyone conducting **online research**, including **students**, **researchers**, **content creators**, and professionals looking for accurate, up-to-date, and verifiable information. It also serves as an excellent foundation for building more sophisticated AI-driven applications.\n\n### What problem does this workflow solve? / Use case\n\nThis workflow automates web searches by enabling an AI agent to retrieve and summarize external, verifiable information efficiently, ensuring accuracy through source citations.\n\n### What this workflow does\n\n* Connects an AI agent node to [SearchAPI.io](https://searchapi.io/) as an integrated search tool.\n* Empowers the AI agent to perform real-time web searches using various SearchAPI engines (e.g., Google, Bing).\n* Allows the AI agent to dynamically determine search parameters based on user interaction, delivering contextually relevant results.\n* Ensures responses include clearly cited sources for validation and further exploration.\n\n### Setup\n\n1. **API Configuration**:\n\n   * Set your [SearchAPI.io](https://searchapi.io/) credentials in n8n.\n   * Connect your preferred AI provider (e.g., OpenRouter, ChatGPT) to the AI agent node.\n\n2. **Input Requirements**:\n\n   * User inputs queries via chat interaction with the AI agent.\n\n3. **Configure the AI Agent Node**:\n\n   * Select the desired search engines from SearchAPI (e.g., Google, Bing).\n   * Define parameters the agent can adjust for refined searches.\n\n### How to customize this workflow to your needs\n\n* Integrate additional nodes to structure or store search results (e.g., saving to databases, Notion, Google Sheets).\n* Extend chatbot capabilities to integrate with messaging platforms (Slack, Discord) or email notifications.\n* Adjust search parameters and filters within the AI agent node to tailor information retrieval.\n\n### Example Usage\n\n* **Input**: User asks, \"What are the latest developments in AI regulation?\"\n* **Output**: AI retrieves, summarizes, and cites recent, authoritative articles and news sources from the web.\n",
+  "workflow": {
+    "id": "onyc3N5GKCxzWfmi",
+    "meta": {
+      "instanceId": "54299f860163fe60974599588ae4c20ee888191a431346b258503c2db8b536ed",
+      "templateCredsSetupCompleted": true
+    },
+    "name": "Chatbot that searches the web",
+    "tags": [],
+    "nodes": [
+      {
+        "id": "976aa8a4-d286-478a-8cc9-4577e220174b",
+        "name": "When chat message received",
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "position": [
+          -300,
+          80
+        ],
+        "webhookId": "d48f9e07-3c05-4be8-86ca-5cee4c27b78f",
+        "parameters": {
+          "options": {}
+        },
+        "typeVersion": 1.1
+      },
+      {
+        "id": "44236749-af9f-4843-a1ab-e54008b4c525",
+        "name": "Simple Memory",
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "position": [
+          40,
+          300
+        ],
+        "parameters": {
+          "contextWindowLength": 20
+        },
+        "typeVersion": 1.3
+      },
+      {
+        "id": "33536ea4-c8fe-4525-a2d2-905180259e8d",
+        "name": "AI Agent",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          -48,
+          80
+        ],
+        "parameters": {
+          "options": {}
+        },
+        "typeVersion": 1.8
+      },
+      {
+        "id": "10436a1a-4993-4fc5-aca7-686db5bf7441",
+        "name": "OpenRouter Chat Model",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "position": [
+          -80,
+          300
+        ],
+        "parameters": {
+          "model": "deepseek/deepseek-chat:free",
+          "options": {}
+        },
+        "credentials": {
+          "openRouterApi": {
+            "id": "tDWBerCVn0gOn7YX",
+            "name": "OpenRouter account"
+          }
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "73d024bd-aab3-491c-afc4-79194f4ac7fc",
+        "name": "SearchAPI",
+        "type": "CUSTOM.searchApiTool",
+        "position": [
+          260,
+          300
+        ],
+        "parameters": {
+          "parameters": {
+            "parameter": [
+              {
+                "name": "q",
+                "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Value', ``, 'string') }}"
+              },
+              {}
+            ]
+          },
+          "requestOptions": {},
+          "toolDescription": "Call this tool whenever the answer might require fresh, niche, or externally-verifiable information. Make sure to always cite the sources in the final reply. "
+        },
+        "credentials": {
+          "searchApi": {
+            "id": "rTFvdffzP7fPVaVr",
+            "name": "SearchAPI account"
+          }
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "7443e1c1-1b12-453d-89b3-9875ed07749f",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          -400,
+          -140
+        ],
+        "parameters": {
+          "color": 5,
+          "width": 340,
+          "content": "## SearchAPI AI Agent\nWhenever you ask a question that should be searched on the web, the AI Agent will use SearchAPI to do it. To run this workflow, you need to have the credentials for Searchapi.io and some LLM provider."
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "9617510c-6ff3-4f6c-9e4d-8fbd9b129f95",
+        "name": "Sticky Note1",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          460,
+          400
+        ],
+        "parameters": {
+          "width": 260,
+          "height": 120,
+          "content": "## Tip\nYou can change the node to use any of the engines available on [SearchAPI.io](https://www.searchapi.io/)"
+        },
+        "typeVersion": 1
+      }
+    ],
+    "active": false,
+    "pinData": {},
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "versionId": "1f42e7e2-32ca-4ceb-8f1e-1de26f09d525",
+    "connections": {
+      "SearchAPI": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Simple Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenRouter Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    }
+  },
+  "lastUpdatedBy": 29,
+  "workflowInfo": {
+    "nodeCount": 7,
+    "nodeTypes": {
+      "CUSTOM.searchApiTool": {
+        "count": 1
+      },
+      "n8n-nodes-base.stickyNote": {
+        "count": 2
+      },
+      "@n8n/n8n-nodes-langchain.agent": {
+        "count": 1
+      },
+      "@n8n/n8n-nodes-langchain.chatTrigger": {
+        "count": 1
+      },
+      "@n8n/n8n-nodes-langchain.lmChatOpenRouter": {
+        "count": 1
+      },
+      "@n8n/n8n-nodes-langchain.memoryBufferWindow": {
+        "count": 1
+      }
+    }
+  },
+  "user": {
+    "name": "Pedro Santos",
+    "username": "dapedu",
+    "bio": "I'm a software developer with over 4+ years of experience. I work using software to solve clients problems and I believe n8n is a nice way to solve some problems faster!",
+    "verified": false,
+    "links": [
+      ""
+    ],
+    "avatar": "https://gravatar.com/avatar/39912cd80161aa7b012cc70e7e0f646d4202763b6cae502b14e9dc3e19dd54d5?r=pg&d=retro&size=200"
+  },
+  "nodes": [
+    {
+      "id": 565,
+      "icon": "fa:sticky-note",
+      "name": "n8n-nodes-base.stickyNote",
+      "codex": {
+        "data": {
+          "alias": [
+            "Comments",
+            "Notes",
+            "Sticky"
+          ],
+          "categories": [
+            "Core Nodes"
+          ],
+          "nodeVersion": "1.0",
+          "codexVersion": "1.0",
+          "subcategories": {
+            "Core Nodes": [
+              "Helpers"
+            ]
+          }
+        }
+      },
+      "group": "[\"input\"]",
+      "defaults": {
+        "name": "Sticky Note",
+        "color": "#FFD233"
+      },
+      "iconData": {
+        "icon": "sticky-note",
+        "type": "icon"
+      },
+      "displayName": "Sticky Note",
+      "typeVersion": 1,
+      "nodeCategories": [
+        {
+          "id": 9,
+          "name": "Core Nodes"
+        }
+      ]
+    },
+    {
+      "id": 1119,
+      "icon": "fa:robot",
+      "name": "@n8n/n8n-nodes-langchain.agent",
+      "codex": {
+        "data": {
+          "alias": [
+            "LangChain",
+            "Chat",
+            "Conversational",
+            "Plan and Execute",
+            "ReAct",
+            "Tools"
+          ],
+          "resources": {
+            "primaryDocumentation": [
+              {
+                "url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/"
+              }
+            ]
+          },
+          "categories": [
+            "AI",
+            "Langchain"
+          ],
+          "subcategories": {
+            "AI": [
+              "Agents",
+              "Root Nodes"
+            ]
+          }
+        }
+      },
+      "group": "[\"transform\"]",
+      "defaults": {
+        "name": "AI Agent",
+        "color": "#404040"
+      },
+      "iconData": {
+        "icon": "robot",
+        "type": "icon"
+      },
+      "displayName": "AI Agent",
+      "typeVersion": 2,
+      "nodeCategories": [
+        {
+          "id": 25,
+          "name": "AI"
+        },
+        {
+          "id": 26,
+          "name": "Langchain"
+        }
+      ]
+    },
+    {
+      "id": 1163,
+      "icon": "fa:database",
+      "name": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "codex": {
+        "data": {
+          "resources": {
+            "primaryDocumentation": [
+              {
+                "url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.memorybufferwindow/"
+              }
+            ]
+          },
+          "categories": [
+            "AI",
+            "Langchain"
+          ],
+          "subcategories": {
+            "AI": [
+              "Memory"
+            ],
+            "Memory": [
+              "For beginners"
+            ]
+          }
+        }
+      },
+      "group": "[\"transform\"]",
+      "defaults": {
+        "name": "Simple Memory"
+      },
+      "iconData": {
+        "icon": "database",
+        "type": "icon"
+      },
+      "displayName": "Simple Memory",
+      "typeVersion": 1,
+      "nodeCategories": [
+        {
+          "id": 25,
+          "name": "AI"
+        },
+        {
+          "id": 26,
+          "name": "Langchain"
+        }
+      ]
+    },
+    {
+      "id": 1247,
+      "icon": "fa:comments",
+      "name": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "codex": {
+        "data": {
+          "resources": {
+            "primaryDocumentation": [
+              {
+                "url": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-langchain.chattrigger/"
+              }
+            ]
+          },
+          "categories": [
+            "Core Nodes",
+            "Langchain"
+          ]
+        }
+      },
+      "group": "[\"trigger\"]",
+      "defaults": {
+        "name": "When chat message received"
+      },
+      "iconData": {
+        "icon": "comments",
+        "type": "icon"
+      },
+      "displayName": "Chat Trigger",
+      "typeVersion": 1,
+      "nodeCategories": [
+        {
+          "id": 9,
+          "name": "Core Nodes"
+        },
+        {
+          "id": 26,
+          "name": "Langchain"
+        }
+      ]
+    },
+    {
+      "id": 1281,
+      "icon": "file:openrouter.svg",
+      "name": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "codex": {
+        "data": {
+          "resources": {
+            "primaryDocumentation": [
+              {
+                "url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.lmchatopenrouter/"
+              }
+            ]
+          },
+          "categories": [
+            "AI",
+            "Langchain"
+          ],
+          "subcategories": {
+            "AI": [
+              "Language Models",
+              "Root Nodes"
+            ],
+            "Language Models": [
+              "Chat Models (Recommended)"
+            ]
+          }
+        }
+      },
+      "group": "[\"transform\"]",
+      "defaults": {
+        "name": "OpenRouter Chat Model"
+      },
+      "iconData": {
+        "type": "file",
+        "fileBuffer": "data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjOTRBM0I4IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI0IDI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0aXRsZT5PcGVuUm91dGVyPC90aXRsZT48cGF0aCBkPSJNMTYuODA0IDEuOTU3bDcuMjIgNC4xMDV2LjA4N0wxNi43MyAxMC4yMWwuMDE3LTIuMTE3LS44MjEtLjAzYy0xLjA1OS0uMDI4LTEuNjExLjAwMi0yLjI2OC4xMS0xLjA2NC4xNzUtMi4wMzguNTc3LTMuMTQ3IDEuMzUyTDguMzQ1IDExLjAzYy0uMjg0LjE5NS0uNDk1LjMzNi0uNjguNDU1bC0uNTE1LjMyMi0uMzk3LjIzNC4zODUuMjMuNTMuMzM4Yy40NzYuMzE0IDEuMTcuNzk2IDIuNzAxIDEuODY2IDEuMTEuNzc1IDIuMDgzIDEuMTc3IDMuMTQ3IDEuMzUybC4zLjA0NWMuNjk0LjA5MSAxLjM3NS4wOTQgMi44MjUuMDMzbC4wMjItMi4xNTkgNy4yMiA0LjEwNXYuMDg3TDE2LjU4OSAyMmwuMDE0LTEuODYyLS42MzUuMDIyYy0xLjM4Ni4wNDItMi4xMzcuMDAyLTMuMTM4LS4xNjItMS42OTQtLjI4LTMuMjYtLjkyNi00Ljg4MS0yLjA1OWwtMi4xNTgtMS41YTIxLjk5NyAyMS45OTcgMCAwMC0uNzU1LS40OThsLS40NjctLjI4YTU1LjkyNyA1NS45MjcgMCAwMC0uNzYtLjQzQzIuOTA4IDE0LjczLjU2MyAxNC4xMTYgMCAxNC4xMTZWOS44ODhsLjE0LjAwNGMuNTY0LS4wMDcgMi45MS0uNjIyIDMuODA5LTEuMTI0bDEuMDE2LS41OC40MzgtLjI3NGMuNDI4LS4yOCAxLjA3Mi0uNzI2IDIuNjg2LTEuODUzIDEuNjIxLTEuMTMzIDMuMTg2LTEuNzggNC44ODEtMi4wNTkgMS4xNTItLjE5IDEuOTc0LS4yMTMgMy44MTQtLjEzOGwuMDItMS45MDd6Ij48L3BhdGg+PC9zdmc+Cg=="
+      },
+      "displayName": "OpenRouter Chat Model",
+      "typeVersion": 1,
+      "nodeCategories": [
+        {
+          "id": 25,
+          "name": "AI"
+        },
+        {
+          "id": 26,
+          "name": "Langchain"
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "id": 20,
+      "name": "Building Blocks"
+    },
+    {
+      "id": 25,
+      "name": "AI"
+    },
+    {
+      "id": 28,
+      "name": "IT Ops"
+    }
+  ],
+  "image": []
+}

@@ -1,0 +1,641 @@
+{
+  "id": 3828,
+  "name": "Generate YouTube Video Summaries with SearchAPI Transcripts and LLM",
+  "views": 0,
+  "recentViews": 0,
+  "totalViews": 0,
+  "createdAt": "2025-05-02T04:03:32.827Z",
+  "description": "## 🎥 Summarize YouTube Videos using SearchAPI & LLM\n\n### Who is this for?\n\nThis workflow is perfect for **content creators**, **students**, **digital marketers**, **educators**, and **researchers** who want to quickly summarize YouTube videos.\n\n### What problem does this workflow solve? / Use case\n\nManually extracting important information from lengthy YouTube videos can be tedious and error-prone. This workflow streamlines the process by automatically fetching video transcripts using [SearchAPI.io](https://searchapi.io/) and producing concise, informative summaries through a summarization chain powered by any LLM provider. This allows users to rapidly access crucial information without manual transcription or detailed watching.\n\n### What this workflow does\n\n* Fetches the complete transcript of a YouTube video using SearchAPI.\n* Combines the retrieved transcript into a single, continuous text.\n* Uses a **Summarization Chain** with an LLM (e.g., OpenRouter models) to create a concise summary of the video content.\n\n### Setup\n\n1. **API Configuration**:\n\n   * Set up your [SearchAPI.io](https://searchapi.io/) credentials in n8n.\n   * Add your preferred LLM provider credentials (e.g., OpenRouter API).\n\n2. **Input Requirements**:\n\n   * Provide the YouTube video ID (e.g., `wBuULAoJxok`).\n\n3. **Connect LLM Integration**:\n\n   * Configure the summarization chain with your chosen model and parameters for text splitting.\n\n### How to customize this workflow to your needs\n\n* Adjust the summarization model or modify text-splitter parameters to handle different lengths and complexities of video transcripts.\n* Integrate additional nodes to export summaries directly into your tools of choice, such as Google Drive, Slack, or email.\n* Customize prompt templates in the summarization chain to obtain different summary styles (bullet points, paragraphs, etc.).\n* Modify the trigger to what works best for you.\n\n### Example Usage\n\n1. **Input**: YouTube video ID (`wBuULAoJxok`).\n2. **Output**: A concise, actionable summary highlighting key ideas, recommendations, and insights from the video.\n",
+  "workflow": {
+    "id": "RPlqIyKOfS4uviYK",
+    "meta": {
+      "instanceId": "54299f860163fe60974599588ae4c20ee888191a431346b258503c2db8b536ed",
+      "templateCredsSetupCompleted": true
+    },
+    "name": "Get Youtube Video Summary Using Searchapi",
+    "tags": [],
+    "nodes": [
+      {
+        "id": "4c889838-9062-4797-9b40-e966a3d1d1d4",
+        "name": "When clicking ‘Test workflow’",
+        "type": "n8n-nodes-base.manualTrigger",
+        "position": [
+          -160,
+          0
+        ],
+        "parameters": {},
+        "typeVersion": 1
+      },
+      {
+        "id": "3df790f2-4c6d-47d2-9b88-7967eb3bb78f",
+        "name": "SearchAPI",
+        "type": "CUSTOM.searchApi",
+        "position": [
+          60,
+          0
+        ],
+        "parameters": {
+          "engine": "youtube_transcripts",
+          "parameters": {
+            "parameter": [
+              {
+                "name": "video_id",
+                "value": "2XTdEG0Sus0"
+              },
+              {
+                "name": "lang",
+                "value": "en"
+              }
+            ]
+          },
+          "requestOptions": {}
+        },
+        "credentials": {
+          "searchApi": {
+            "id": "rTFvdffzP7fPVaVr",
+            "name": "SearchAPI account"
+          }
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "f5a5352b-07d7-4fff-b5c2-2512cabd3497",
+        "name": "OpenRouter Chat Model",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "position": [
+          748,
+          220
+        ],
+        "parameters": {
+          "model": "qwen/qwen3-0.6b-04-28:free",
+          "options": {}
+        },
+        "credentials": {
+          "openRouterApi": {
+            "id": "tDWBerCVn0gOn7YX",
+            "name": "OpenRouter account"
+          }
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "cd5b5f49-5187-4b97-959f-e1662f0bc3d5",
+        "name": "Summarization Chain",
+        "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+        "position": [
+          720,
+          0
+        ],
+        "parameters": {
+          "options": {},
+          "chunkingMode": "advanced"
+        },
+        "typeVersion": 2
+      },
+      {
+        "id": "e6ba0b10-7b96-46c6-ae0d-fb3c112edab9",
+        "name": "Recursive Character Text Splitter",
+        "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+        "position": [
+          868,
+          220
+        ],
+        "parameters": {
+          "options": {},
+          "chunkSize": 6000
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "6bd07e32-e41d-4513-bfbe-d5ee93f18ddb",
+        "name": "Split Out",
+        "type": "n8n-nodes-base.splitOut",
+        "position": [
+          280,
+          0
+        ],
+        "parameters": {
+          "options": {},
+          "fieldToSplitOut": "transcripts"
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "52f39b7e-dfb0-469f-9b61-64fd0343e972",
+        "name": "Summarize",
+        "type": "n8n-nodes-base.summarize",
+        "position": [
+          500,
+          0
+        ],
+        "parameters": {
+          "options": {},
+          "fieldsToSummarize": {
+            "values": [
+              {
+                "field": "text",
+                "separateBy": " ",
+                "aggregation": "concatenate"
+              }
+            ]
+          }
+        },
+        "typeVersion": 1.1
+      },
+      {
+        "id": "589f34cd-852c-46f9-98b6-811622fd96fa",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          -180,
+          -280
+        ],
+        "parameters": {
+          "color": 5,
+          "width": 320,
+          "content": "## Youtube Video Summary\nGiven a **video_id** from Youtube, we concatenate the data and pass it to a summarization chain. To run this workflow, you need to have the credentials for Searchapi.io and some LLM provider."
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "08e946b4-824d-4dff-a5f1-ce11d05c8727",
+        "name": "Sticky Note1",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          40,
+          220
+        ],
+        "parameters": {
+          "height": 120,
+          "content": "## Tip \nYou can pass the **video_id** from previous nodes to make a better automation"
+        },
+        "typeVersion": 1
+      }
+    ],
+    "active": false,
+    "pinData": {},
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "versionId": "bbfb7334-6f7b-4638-9efb-346b318fffee",
+    "connections": {
+      "SearchAPI": {
+        "main": [
+          [
+            {
+              "node": "Split Out",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split Out": {
+        "main": [
+          [
+            {
+              "node": "Summarize",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Summarize": {
+        "main": [
+          [
+            {
+              "node": "Summarization Chain",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenRouter Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Summarization Chain",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Recursive Character Text Splitter": {
+        "ai_textSplitter": [
+          [
+            {
+              "node": "Summarization Chain",
+              "type": "ai_textSplitter",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking ‘Test workflow’": {
+        "main": [
+          [
+            {
+              "node": "SearchAPI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    }
+  },
+  "lastUpdatedBy": 29,
+  "workflowInfo": {
+    "nodeCount": 9,
+    "nodeTypes": {
+      "CUSTOM.searchApi": {
+        "count": 1
+      },
+      "n8n-nodes-base.splitOut": {
+        "count": 1
+      },
+      "n8n-nodes-base.summarize": {
+        "count": 1
+      },
+      "n8n-nodes-base.stickyNote": {
+        "count": 2
+      },
+      "n8n-nodes-base.manualTrigger": {
+        "count": 1
+      },
+      "@n8n/n8n-nodes-langchain.lmChatOpenRouter": {
+        "count": 1
+      },
+      "@n8n/n8n-nodes-langchain.chainSummarization": {
+        "count": 1
+      },
+      "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter": {
+        "count": 1
+      }
+    }
+  },
+  "user": {
+    "name": "Pedro Santos",
+    "username": "dapedu",
+    "bio": "I'm a software developer with over 4+ years of experience. I work using software to solve clients problems and I believe n8n is a nice way to solve some problems faster!",
+    "verified": false,
+    "links": [
+      ""
+    ],
+    "avatar": "https://gravatar.com/avatar/39912cd80161aa7b012cc70e7e0f646d4202763b6cae502b14e9dc3e19dd54d5?r=pg&d=retro&size=200"
+  },
+  "nodes": [
+    {
+      "id": 565,
+      "icon": "fa:sticky-note",
+      "name": "n8n-nodes-base.stickyNote",
+      "codex": {
+        "data": {
+          "alias": [
+            "Comments",
+            "Notes",
+            "Sticky"
+          ],
+          "categories": [
+            "Core Nodes"
+          ],
+          "nodeVersion": "1.0",
+          "codexVersion": "1.0",
+          "subcategories": {
+            "Core Nodes": [
+              "Helpers"
+            ]
+          }
+        }
+      },
+      "group": "[\"input\"]",
+      "defaults": {
+        "name": "Sticky Note",
+        "color": "#FFD233"
+      },
+      "iconData": {
+        "icon": "sticky-note",
+        "type": "icon"
+      },
+      "displayName": "Sticky Note",
+      "typeVersion": 1,
+      "nodeCategories": [
+        {
+          "id": 9,
+          "name": "Core Nodes"
+        }
+      ]
+    },
+    {
+      "id": 838,
+      "icon": "fa:mouse-pointer",
+      "name": "n8n-nodes-base.manualTrigger",
+      "codex": {
+        "data": {
+          "resources": {
+            "generic": [],
+            "primaryDocumentation": [
+              {
+                "url": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.manualworkflowtrigger/"
+              }
+            ]
+          },
+          "categories": [
+            "Core Nodes"
+          ],
+          "nodeVersion": "1.0",
+          "codexVersion": "1.0"
+        }
+      },
+      "group": "[\"trigger\"]",
+      "defaults": {
+        "name": "When clicking ‘Test workflow’",
+        "color": "#909298"
+      },
+      "iconData": {
+        "icon": "mouse-pointer",
+        "type": "icon"
+      },
+      "displayName": "Manual Trigger",
+      "typeVersion": 1,
+      "nodeCategories": [
+        {
+          "id": 9,
+          "name": "Core Nodes"
+        }
+      ]
+    },
+    {
+      "id": 1121,
+      "icon": "fa:link",
+      "name": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "codex": {
+        "data": {
+          "alias": [
+            "LangChain"
+          ],
+          "resources": {
+            "primaryDocumentation": [
+              {
+                "url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainsummarization/"
+              }
+            ]
+          },
+          "categories": [
+            "AI",
+            "Langchain"
+          ],
+          "subcategories": {
+            "AI": [
+              "Chains",
+              "Root Nodes"
+            ]
+          }
+        }
+      },
+      "group": "[\"transform\"]",
+      "defaults": {
+        "name": "Summarization Chain",
+        "color": "#909298"
+      },
+      "iconData": {
+        "icon": "link",
+        "type": "icon"
+      },
+      "displayName": "Summarization Chain",
+      "typeVersion": 2,
+      "nodeCategories": [
+        {
+          "id": 25,
+          "name": "AI"
+        },
+        {
+          "id": 26,
+          "name": "Langchain"
+        }
+      ]
+    },
+    {
+      "id": 1191,
+      "icon": "fa:grip-lines-vertical",
+      "name": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "codex": {
+        "data": {
+          "resources": {
+            "primaryDocumentation": [
+              {
+                "url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.textsplitterrecursivecharactertextsplitter/"
+              }
+            ]
+          },
+          "categories": [
+            "AI",
+            "Langchain"
+          ],
+          "subcategories": {
+            "AI": [
+              "Text Splitters"
+            ]
+          }
+        }
+      },
+      "group": "[\"transform\"]",
+      "defaults": {
+        "name": "Recursive Character Text Splitter"
+      },
+      "iconData": {
+        "icon": "grip-lines-vertical",
+        "type": "icon"
+      },
+      "displayName": "Recursive Character Text Splitter",
+      "typeVersion": 1,
+      "nodeCategories": [
+        {
+          "id": 25,
+          "name": "AI"
+        },
+        {
+          "id": 26,
+          "name": "Langchain"
+        }
+      ]
+    },
+    {
+      "id": 1239,
+      "icon": "file:splitOut.svg",
+      "name": "n8n-nodes-base.splitOut",
+      "codex": {
+        "data": {
+          "alias": [
+            "Split",
+            "Nested",
+            "Transform",
+            "Array",
+            "List",
+            "Item"
+          ],
+          "details": "",
+          "resources": {
+            "generic": [],
+            "primaryDocumentation": [
+              {
+                "url": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.splitout/"
+              }
+            ]
+          },
+          "categories": [
+            "Core Nodes"
+          ],
+          "nodeVersion": "1.0",
+          "codexVersion": "1.0",
+          "subcategories": {
+            "Core Nodes": [
+              "Data Transformation"
+            ]
+          }
+        }
+      },
+      "group": "[\"transform\"]",
+      "defaults": {
+        "name": "Split Out"
+      },
+      "iconData": {
+        "type": "file",
+        "fileBuffer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiBmaWxsPSJub25lIj48ZyBmaWxsPSIjOUI2REQ1IiBjbGlwLXBhdGg9InVybCgjYSkiPjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTQ4MCAxNDhjMC02LjYyNy01LjM3My0xMi0xMi0xMkgzMjJjLTYuNjI3IDAtMTIgNS4zNzMtMTIgMTJ2MjRjMCA2LjYyNyA1LjM3MyAxMiAxMiAxMmgxNDZjNi42MjcgMCAxMi01LjM3MyAxMi0xMnptMCA5NmMwLTYuNjI3LTUuMzczLTEyLTEyLTEySDMyMmMtNi42MjcgMC0xMiA1LjM3My0xMiAxMnYyNGMwIDYuNjI3IDUuMzczIDEyIDEyIDEyaDE0NmM2LjYyNyAwIDEyLTUuMzczIDEyLTEyem0wIDk2YzAtNi42MjctNS4zNzMtMTItMTItMTJIMzIyYy02LjYyNyAwLTEyIDUuMzczLTEyIDEydjI0YzAgNi42MjcgNS4zNzMgMTIgMTIgMTJoMTQ2YzYuNjI3IDAgMTItNS4zNzMgMTItMTJ6IiBjbGlwLXJ1bGU9ImV2ZW5vZGQiLz48cGF0aCBkPSJNNDM4IDc2YzAgNi42MjctNS4zNzMgMTItMTIgMTJIMzA5Ljc4M2MtMTcuNjczIDAtMzIgMTQuMzI3LTMyIDMydjU2YzAgMjYuOTc4LTEwLjI3MiA1MS41NTctMjcuMTE5IDcwLjAzOS01LjA1NSA1LjU0NS01LjA1NSAxNC4zNzcgMCAxOS45MjIgMTYuODQ3IDE4LjQ4MiAyNy4xMTkgNDMuMDYxIDI3LjExOSA3MC4wMzl2NTZjMCAxNy42NzMgMTQuMzI3IDMyIDMyIDMySDQyNmM2LjYyNyAwIDEyIDUuMzczIDEyIDEydjI0YzAgNi42MjctNS4zNzMgMTItMTIgMTJIMzA5Ljc4M2MtNDQuMTgzIDAtODAtMzUuODE3LTgwLTgwdi01NmMwLTMwLjkyOC0yNS4wNzItNTYtNTYtNTZhNS43ODMgNS43ODMgMCAwIDEtNS43ODMtNS43ODN2LTM2LjQzNGE1Ljc4MyA1Ljc4MyAwIDAgMSA1Ljc4My01Ljc4M2MzMC45MjggMCA1Ni0yNS4wNzIgNTYtNTZ2LTU2YzAtNDQuMTgzIDM1LjgxNy04MCA4MC04MEg0MjZjNi42MjcgMCAxMiA1LjM3MyAxMiAxMnoiLz48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMzYgMjQ0YzAtNi42MjctNS4zNzMtMTItMTItMTJIMTJjLTYuNjI3IDAtMTIgNS4zNzMtMTIgMTJ2MjRjMCA2LjYyNyA1LjM3MyAxMiAxMiAxMmgxMTJjNi42MjcgMCAxMi01LjM3MyAxMi0xMnoiIGNsaXAtcnVsZT0iZXZlbm9kZCIvPjwvZz48ZGVmcz48Y2xpcFBhdGggaWQ9ImEiPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik01MTIgMEgwdjUxMmg1MTJ6Ii8+PC9jbGlwUGF0aD48L2RlZnM+PC9zdmc+"
+      },
+      "displayName": "Split Out",
+      "typeVersion": 1,
+      "nodeCategories": [
+        {
+          "id": 9,
+          "name": "Core Nodes"
+        }
+      ]
+    },
+    {
+      "id": 1241,
+      "icon": "file:summarize.svg",
+      "name": "n8n-nodes-base.summarize",
+      "codex": {
+        "data": {
+          "alias": [
+            "Append",
+            "Array",
+            "Average",
+            "Concatenate",
+            "Count",
+            "Group",
+            "Item",
+            "List",
+            "Max",
+            "Min",
+            "Pivot",
+            "Sum",
+            "Summarise",
+            "Summarize",
+            "Transform",
+            "Unique"
+          ],
+          "details": "",
+          "resources": {
+            "generic": [],
+            "primaryDocumentation": [
+              {
+                "url": "https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.summarize/"
+              }
+            ]
+          },
+          "categories": [
+            "Core Nodes"
+          ],
+          "nodeVersion": "1.0",
+          "codexVersion": "1.0",
+          "subcategories": {
+            "Core Nodes": [
+              "Data Transformation"
+            ]
+          }
+        }
+      },
+      "group": "[\"transform\"]",
+      "defaults": {
+        "name": "Summarize"
+      },
+      "iconData": {
+        "type": "file",
+        "fileBuffer": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiBmaWxsPSJub25lIj48cGF0aCBmaWxsPSIjRjkyIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMzIgOTFjLTE1LjQ2NCAwLTI4IDEyLjUzNi0yOCAyOHYzMTdjMCAxNS40NjQgMTIuNTM2IDI4IDI4IDI4aDI0OGMxNS40NjQgMCAyOC0xMi41MzYgMjgtMjhWMTE5YzAtMTUuNDY0LTEyLjUzNi0yOC0yOC0yOGgtNmE2IDYgMCAwIDEtNi02VjQ5YTYgNiAwIDAgMSA2LTZoNmM0MS45NzQgMCA3NiAzNC4wMjYgNzYgNzZ2MzE3YzAgNDEuOTc0LTM0LjAyNiA3Ni03NiA3NkgxMzJjLTQxLjk3NCAwLTc2LTM0LjAyNi03Ni03NlYxMTljMC00MS45NzQgMzQuMDI2LTc2IDc2LTc2aDZhNiA2IDAgMCAxIDYgNnYzNmE2IDYgMCAwIDEtNiA2eiIgY2xpcC1ydWxlPSJldmVub2RkIi8+PHBhdGggZmlsbD0iI0Y5MiIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMjU2IDBjLTI3LjIzMiAwLTUwLjIyNyAxOC4xNDItNTcuNTU4IDQzSDE4MmE2IDYgMCAwIDAtNiA2djcwYTYgNiAwIDAgMCA2IDZoMTQ4YTYgNiAwIDAgMCA2LTZWNDlhNiA2IDAgMCAwLTYtNmgtMTYuNDQyQzMwNi4yMjcgMTguMTQyIDI4My4yMzIgMCAyNTYgMG0wIDQwYTE5LjkgMTkuOSAwIDAgMC0xMC41NDEgM0MyMzkuNzgxIDQ2LjUyOCAyMzYgNTIuODIzIDIzNiA2MGMwIDExLjA0NiA4Ljk1NCAyMCAyMCAyMHMyMC04Ljk1NCAyMC0yMGMwLTcuMTc3LTMuNzgxLTEzLjQ3Mi05LjQ1OS0xN0ExOS45IDE5LjkgMCAwIDAgMjU2IDQwbTEwMSAxNzljMCA2LjYyNy01LjM3MyAxMi0xMiAxMkgyMzNjLTYuNjI3IDAtMTItNS4zNzMtMTItMTJ2LTI0YzAtNi42MjcgNS4zNzMtMTIgMTItMTJoMTEyYzYuNjI3IDAgMTIgNS4zNzMgMTIgMTJ6IiBjbGlwLXJ1bGU9ImV2ZW5vZGQiLz48cGF0aCBmaWxsPSIjRjkyIiBkPSJNMTk3IDIwN2MwIDEzLjI1NS0xMC43NDUgMjQtMjQgMjRzLTI0LTEwLjc0NS0yNC0yNCAxMC43NDUtMjQgMjQtMjQgMjQgMTAuNzQ1IDI0IDI0Ii8+PHBhdGggZmlsbD0iI0Y5MiIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMzU3IDM5NWMwIDYuNjI3LTUuMzczIDEyLTEyIDEySDIzM2MtNi42MjcgMC0xMi01LjM3My0xMi0xMnYtMjRjMC02LjYyNyA1LjM3My0xMiAxMi0xMmgxMTJjNi42MjcgMCAxMiA1LjM3MyAxMiAxMnoiIGNsaXAtcnVsZT0iZXZlbm9kZCIvPjxwYXRoIGZpbGw9IiNGOTIiIGQ9Ik0xOTcgMzgzYzAgMTMuMjU1LTEwLjc0NSAyNC0yNCAyNHMtMjQtMTAuNzQ1LTI0LTI0IDEwLjc0NS0yNCAyNC0yNCAyNCAxMC43NDUgMjQgMjQiLz48cGF0aCBmaWxsPSIjRjkyIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0zNTcgMzA3YzAgNi42MjctNS4zNzMgMTItMTIgMTJIMjMzYy02LjYyNyAwLTEyLTUuMzczLTEyLTEydi0yNGMwLTYuNjI3IDUuMzczLTEyIDEyLTEyaDExMmM2LjYyNyAwIDEyIDUuMzczIDEyIDEyeiIgY2xpcC1ydWxlPSJldmVub2RkIi8+PHBhdGggZmlsbD0iI0Y5MiIgZD0iTTE5NyAyOTVjMCAxMy4yNTUtMTAuNzQ1IDI0LTI0IDI0cy0yNC0xMC43NDUtMjQtMjQgMTAuNzQ1LTI0IDI0LTI0IDI0IDEwLjc0NSAyNCAyNCIvPjwvc3ZnPg=="
+      },
+      "displayName": "Summarize",
+      "typeVersion": 1,
+      "nodeCategories": [
+        {
+          "id": 9,
+          "name": "Core Nodes"
+        }
+      ]
+    },
+    {
+      "id": 1281,
+      "icon": "file:openrouter.svg",
+      "name": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "codex": {
+        "data": {
+          "resources": {
+            "primaryDocumentation": [
+              {
+                "url": "https://docs.n8n.io/integrations/builtin/cluster-nodes/sub-nodes/n8n-nodes-langchain.lmchatopenrouter/"
+              }
+            ]
+          },
+          "categories": [
+            "AI",
+            "Langchain"
+          ],
+          "subcategories": {
+            "AI": [
+              "Language Models",
+              "Root Nodes"
+            ],
+            "Language Models": [
+              "Chat Models (Recommended)"
+            ]
+          }
+        }
+      },
+      "group": "[\"transform\"]",
+      "defaults": {
+        "name": "OpenRouter Chat Model"
+      },
+      "iconData": {
+        "type": "file",
+        "fileBuffer": "data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjOTRBM0I4IiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI0IDI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0aXRsZT5PcGVuUm91dGVyPC90aXRsZT48cGF0aCBkPSJNMTYuODA0IDEuOTU3bDcuMjIgNC4xMDV2LjA4N0wxNi43MyAxMC4yMWwuMDE3LTIuMTE3LS44MjEtLjAzYy0xLjA1OS0uMDI4LTEuNjExLjAwMi0yLjI2OC4xMS0xLjA2NC4xNzUtMi4wMzguNTc3LTMuMTQ3IDEuMzUyTDguMzQ1IDExLjAzYy0uMjg0LjE5NS0uNDk1LjMzNi0uNjguNDU1bC0uNTE1LjMyMi0uMzk3LjIzNC4zODUuMjMuNTMuMzM4Yy40NzYuMzE0IDEuMTcuNzk2IDIuNzAxIDEuODY2IDEuMTEuNzc1IDIuMDgzIDEuMTc3IDMuMTQ3IDEuMzUybC4zLjA0NWMuNjk0LjA5MSAxLjM3NS4wOTQgMi44MjUuMDMzbC4wMjItMi4xNTkgNy4yMiA0LjEwNXYuMDg3TDE2LjU4OSAyMmwuMDE0LTEuODYyLS42MzUuMDIyYy0xLjM4Ni4wNDItMi4xMzcuMDAyLTMuMTM4LS4xNjItMS42OTQtLjI4LTMuMjYtLjkyNi00Ljg4MS0yLjA1OWwtMi4xNTgtMS41YTIxLjk5NyAyMS45OTcgMCAwMC0uNzU1LS40OThsLS40NjctLjI4YTU1LjkyNyA1NS45MjcgMCAwMC0uNzYtLjQzQzIuOTA4IDE0LjczLjU2MyAxNC4xMTYgMCAxNC4xMTZWOS44ODhsLjE0LjAwNGMuNTY0LS4wMDcgMi45MS0uNjIyIDMuODA5LTEuMTI0bDEuMDE2LS41OC40MzgtLjI3NGMuNDI4LS4yOCAxLjA3Mi0uNzI2IDIuNjg2LTEuODUzIDEuNjIxLTEuMTMzIDMuMTg2LTEuNzggNC44ODEtMi4wNTkgMS4xNTItLjE5IDEuOTc0LS4yMTMgMy44MTQtLjEzOGwuMDItMS45MDd6Ij48L3BhdGg+PC9zdmc+Cg=="
+      },
+      "displayName": "OpenRouter Chat Model",
+      "typeVersion": 1,
+      "nodeCategories": [
+        {
+          "id": 25,
+          "name": "AI"
+        },
+        {
+          "id": 26,
+          "name": "Langchain"
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "id": 25,
+      "name": "AI"
+    },
+    {
+      "id": 27,
+      "name": "Marketing"
+    }
+  ],
+  "image": []
+}

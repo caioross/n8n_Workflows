@@ -1,0 +1,371 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "trigger": [
+          "any_event"
+        ],
+        "watchWorkspace": true,
+        "options": {}
+      },
+      "id": "e9ceea50-58b6-4cb4-9c31-7a1a7b0ca004",
+      "name": "Slack Trigger",
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        860,
+        400
+      ],
+      "webhookId": "46e3a0d6-7730-4336-8c49-3876c9c178d3",
+      "credentials": {
+        "slackApi": {
+          "id": "aH6V6EwdyNbEQMfa",
+          "name": "JarvisBiz"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "175fee16-9c82-44f7-b57b-adfe78a3d2b9",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b4763b80-58e1-4ac3-bbc1-474216e46e12",
+              "leftValue": "={{ $json.user }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "42a859a1-00b3-436a-96ac-89790c3e9ea3",
+      "name": "Bot check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1080,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {}
+      },
+      "id": "a357ff80-5b4c-4ae1-96e0-2b39119ccc1e",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        640
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "NpK1CS3vf6M1cr13",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Slack Trigger').item.json.text }}",
+        "contextWindowLength": 10
+      },
+      "id": "fd2484b7-8046-4dec-8e97-7b1231505b9d",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "={{ $json.channel }}",
+          "mode": "id"
+        },
+        "text": "On it ! Let me see what i can do ",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "botProfile": {
+            "imageValues": {
+              "profilePhotoType": "image",
+              "icon_url": "https://avatars.slack-edge.com/2024-10-27/7944358420852_5b952a7f3db49f68a3ab_192.png"
+            }
+          }
+        }
+      },
+      "id": "f6239713-0269-48a9-8156-5db9fbf4a03a",
+      "name": "Init Message",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        1300,
+        420
+      ],
+      "webhookId": "5fc6f251-eb0b-48e1-9a5b-0951a6a009b9",
+      "credentials": {
+        "slackApi": {
+          "id": "aH6V6EwdyNbEQMfa",
+          "name": "JarvisBiz"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "={{ $('Slack Trigger').item.json.channel }}",
+          "mode": "id"
+        },
+        "timestamp": "={{ $('Init Message').item.json[\"message_timestamp\"] }}"
+      },
+      "id": "aecddb41-28ff-4f3a-8432-15051fc217c4",
+      "name": "delete init message",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        2300,
+        420
+      ],
+      "webhookId": "02c3d2ce-619b-4850-829f-cca3b8ff85d0",
+      "credentials": {
+        "slackApi": {
+          "id": "aH6V6EwdyNbEQMfa",
+          "name": "JarvisBiz"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "={{ $('Slack Trigger').item.json.channel }}",
+          "mode": "id"
+        },
+        "text": "={{ $('AI Agent').item.json.output }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "botProfile": {
+            "imageValues": {
+              "profilePhotoType": "image",
+              "icon_url": "https://avatars.slack-edge.com/2024-10-27/7944358420852_5b952a7f3db49f68a3ab_192.png"
+            }
+          }
+        }
+      },
+      "id": "ba39a5a8-fee8-4c05-bb20-f19975203c62",
+      "name": "Final response",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [
+        2520,
+        420
+      ],
+      "webhookId": "5fc6f251-eb0b-48e1-9a5b-0951a6a009b9",
+      "credentials": {
+        "slackApi": {
+          "id": "aH6V6EwdyNbEQMfa",
+          "name": "JarvisBiz"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "Get_linkedin_urls",
+        "description": "Use this tool if the user is looking for leads \n\nfor example : Get me CEOs of Startups in the UK",
+        "workflowId": {
+          "__rl": true,
+          "value": "6I3LiehRXCk8g72T",
+          "mode": "list",
+          "cachedResultName": "get_linkedin_urls"
+        }
+      },
+      "id": "3d82565f-4983-454f-87b9-bfdf08080d0d",
+      "name": "Get_linkedin_urls",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1740,
+        660
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Slack Trigger').item.json.text }}",
+        "options": {
+          "systemMessage": "You are a helpful assistantYou are a lead generation AI Agent designed to find business contacts efficiently. Your primary role is to find business leads based on role, location, and number requirements.\n\nYou have access to one tool: Get_linkedin_urls: Find business contacts based on:\n\nJob type/role (CEO, founder, etc.)\n\nLocation\n\nNumber of leads\n\nWhen you have all 3 parameters: Use Get_linkedin_urls with the parameters\n\nWhen parameters are missing: Ask for the missing information conversationally\n\nExamples: User: \"3 CEOs is the UK\" Assistant: I'll find 3 CEO leads in the UK for you. (Use Get_linkedin_urls with: CEO, UK, 3)\n\nUser: \"london 5 cto\" Assistant: I'll search for 5 CTO leads in London. (Use Get_linkedin_urls with: CTO, London, 5)\n\nUser: \"find me 3 ceos is\" Assistant: In which location would you like me to find the CEO leads?\n\nUser: \"10 founders\" Assistant: Where would you like me to find these founder leads?"
+        }
+      },
+      "id": "5cf90f27-12e3-4e8a-a55f-b3eb31b60959",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        1480,
+        420
+      ]
+    }
+  ],
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "Bot check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bot check": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Init Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init Message": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "delete init message": {
+      "main": [
+        [
+          {
+            "node": "Final response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get_linkedin_urls": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "delete init message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "Slack Trigger": [
+      {
+        "user": "U07TH2L1YH4",
+        "type": "message",
+        "ts": "1731851107.005989",
+        "client_msg_id": "1a11c133-a8d4-4e05-906b-73d8aa838955",
+        "text": "find me 3 ceos is the uk",
+        "team": "T07T94XH155",
+        "blocks": [
+          {
+            "type": "rich_text",
+            "block_id": "mR3Cz",
+            "elements": [
+              {
+                "type": "rich_text_section",
+                "elements": [
+                  {
+                    "type": "text",
+                    "text": "find me 3 ceos is the uk"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "channel": "D07TPNC7KM0",
+        "event_ts": "1731851107.005989",
+        "channel_type": "im"
+      }
+    ]
+  }
+}

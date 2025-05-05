@@ -1,0 +1,70 @@
+{
+  "id": 13,
+  "name": "ERROR TO TG",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "bc792796-f36b-4058-9eab-29b9080de0f5",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        660,
+        280
+      ]
+    },
+    {
+      "parameters": {},
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        660,
+        440
+      ],
+      "id": "a80bd7f9-deb8-4ab8-ab8c-13e8402aecdf"
+    },
+    {
+      "parameters": {
+        "chatId": "-511781934",
+        "text": "=<b>n8n workflow error</b> #n8n #error\n<a href=\"{{$json[\"execution\"][\"url\"]}}\">{{$json[\"workflow\"][\"name\"]}}</a>\n\nError: <code>{{$json[\"execution\"][\"error\"][\"message\"]}}</code>\n\n<pre><code>{{$json[\"execution\"][\"error\"][\"stack\"]}}</code></pre>",
+        "additionalFields": {
+          "disable_web_page_preview": true,
+          "parse_mode": "HTML"
+        }
+      },
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        880,
+        440
+      ],
+      "id": "cd7a62c7-cef5-4b2d-882a-358c5ac4db50",
+      "credentials": {
+        "telegramApi": {
+          "id": "9",
+          "name": "Telegram reorx_notify_bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-09-23T07:22:16.612Z",
+  "updatedAt": "2022-10-24T13:14:50.468Z",
+  "settings": {},
+  "staticData": null
+}

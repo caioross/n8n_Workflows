@@ -1,0 +1,154 @@
+{
+  "id": 5,
+  "name": "github issues to tg",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "cdfabdea-d43e-4260-a378-81e11177bc4f",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        640,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "@reorx_share",
+        "text": "=⚡️ {{$json[\"title\"]}} #github #issue\n\n{{$json[\"html_url\"]}}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        660
+      ],
+      "id": "b95ed716-a2dd-49ce-b71e-3292d9e2ce74",
+      "credentials": {
+        "telegramApi": {
+          "id": "8",
+          "name": "Telegram reorx_share_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "unit": "hours"
+      },
+      "name": "Interval",
+      "type": "n8n-nodes-base.interval",
+      "typeVersion": 1,
+      "position": [
+        640,
+        680
+      ],
+      "id": "c184f40d-ead0-43a5-8629-9d67d73994b4"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "=https://api.github.com/search/issues?q={{encodeURIComponent('is:issue author:reorx is:public')}}",
+        "options": {}
+      },
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        860,
+        520
+      ],
+      "id": "22769e21-ca57-4f78-a161-3be2d2da68c2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "10",
+          "name": "GitHub PAT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "/* only return new items */\nconst staticData = getWorkflowStaticData('global');\nconst lastItemId = staticData.lastItemId;\n\nconsole.log('lastItemId', lastItemId);\nconst firstItem = items[0];\nlet newItems = [];\n\nfunction getId(item) {\n  return item.json.id;\n}\n\nif (lastItemId) {\n  for (const item of items) {\n    if (getId(item) === lastItemId) {\n      break;\n    }\n    newItems.push(item)\n  }\n} else {\n  newItems = [firstItem]\n}\n\nstaticData.lastItemId = getId(firstItem)\nreturn newItems"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        520
+      ],
+      "id": "e2879599-36fd-4374-9943-3adc34f0137c"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        660
+      ],
+      "id": "ee4786c8-8f29-42ff-bb32-e80c449425c1"
+    }
+  ],
+  "connections": {
+    "Interval": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-09-11T01:28:39.483Z",
+  "updatedAt": "2022-11-06T05:15:15.836Z",
+  "settings": {},
+  "staticData": {
+    "global": {}
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "id": 3,
+  "name": "youtube like to tg",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "049ebee4-9886-4912-9d03-1adc61bf0020",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "playlistItem",
+        "operation": "getAll",
+        "playlistId": "=LL",
+        "limit": 10,
+        "options": {}
+      },
+      "name": "YouTube",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        660,
+        440
+      ],
+      "id": "047b5d8a-eb97-4ea3-abf8-db8534e2be8d",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "11",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst lastItemId = staticData.lastItemId;\n\nconsole.log('lastItemId', lastItemId);\nconst firstItem = items[0];\nlet newItems = [];\n\nfunction getId(item) {\n  return item.json.contentDetails.videoId;\n}\n\nif (lastItemId) {\n  for (const item of items) {\n    if (getId(item) === lastItemId) {\n      break;\n    }\n    newItems.push(item)\n  }\n} else {\n  newItems = [firstItem]\n}\n\nstaticData.lastItemId = getId(firstItem)\nreturn newItems.reverse()"
+      },
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        860,
+        440
+      ],
+      "id": "d7d8bf26-4d8d-4b10-8617-cceef11f97bb"
+    },
+    {
+      "parameters": {
+        "chatId": "@reorx_share",
+        "text": "=▶️ {{$json[\"snippet\"][\"title\"]}} #youtube\n\nhttps://www.youtube.com/watch?v={{$json[\"contentDetails\"][\"videoId\"]}}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        440
+      ],
+      "id": "38db2024-9fe9-4325-99ae-e6a9aa3e9127",
+      "credentials": {
+        "telegramApi": {
+          "id": "8",
+          "name": "Telegram reorx_share_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "interval": 10,
+        "unit": "minutes"
+      },
+      "name": "Interval",
+      "type": "n8n-nodes-base.interval",
+      "typeVersion": 1,
+      "position": [
+        440,
+        640
+      ],
+      "id": "32aa9ecb-3a55-4ed3-a392-d04e77371d24"
+    }
+  ],
+  "connections": {
+    "YouTube": {
+      "main": [
+        [
+          {
+            "node": "Function",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interval": {
+      "main": [
+        [
+          {
+            "node": "YouTube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-09-11T00:54:07.512Z",
+  "updatedAt": "2022-11-25T23:17:15.363Z",
+  "settings": {},
+  "staticData": {
+    "global": {}
+  }
+}

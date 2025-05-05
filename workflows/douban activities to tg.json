@@ -1,0 +1,146 @@
+{
+  "id": 7,
+  "name": "douban activities to tg",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "06d7e9d8-4073-459d-b8b4-53dd6779e7a8",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        440,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.douban.com/feed/people/novoreorx/interests"
+      },
+      "name": "RSS Feed Read",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        660,
+        440
+      ],
+      "id": "0d82a4aa-261f-42b7-b60a-74441e3a1bb1"
+    },
+    {
+      "parameters": {
+        "functionCode": "/* only return new items */\nconst staticData = getWorkflowStaticData('global');\nconst lastItemId = staticData.lastItemId;\n\nconsole.log('lastItemId', lastItemId);\nconst firstItem = items[0];\nlet newItems = [];\n\nfunction getId(item) {\n  return item.json.guid;\n}\n\nif (lastItemId) {\n  for (const item of items) {\n    if (getId(item) === lastItemId) {\n      break;\n    }\n    newItems.push(item)\n  }\n} else {\n  newItems = [firstItem]\n}\n\nstaticData.lastItemId = getId(firstItem)\nreturn newItems.reverse();"
+      },
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        440
+      ],
+      "id": "d01d4c80-88e1-41cd-8f49-5384af585522"
+    },
+    {
+      "parameters": {
+        "chatId": "@reorx_share",
+        "text": "={{$json[\"tgTitle\"]}}\n\n{{$json[\"link\"]}}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        600
+      ],
+      "id": "7d6b7f60-720c-4060-9e2e-20694f655511",
+      "credentials": {
+        "telegramApi": {
+          "id": "8",
+          "name": "Telegram reorx_share_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "interval": 60,
+        "unit": "minutes"
+      },
+      "name": "Interval",
+      "type": "n8n-nodes-base.interval",
+      "typeVersion": 1,
+      "position": [
+        440,
+        600
+      ],
+      "id": "98f31181-3749-43d7-afc8-d0e29a328a8f"
+    },
+    {
+      "parameters": {
+        "functionCode": "/* filter items */\nconst newItems = [];\n\nconst SYMBOL_MOVIE = '📺'\nconst SYMBOL_BOOK = '📖'\n\nconst tagInfoMap = {\n  watched: { re: /看过/, symbol: SYMBOL_MOVIE },\n  watching: { re: /在看/, symbol: SYMBOL_MOVIE },\n  read: { re: /读过/, symbol: SYMBOL_BOOK },\n  reading: { re: /在读/, symbol: SYMBOL_BOOK },\n}\n\nfor (const item of items) {\n  const title = item.json.title\n  let tag, symbol\n\n  for (const key in tagInfoMap) {\n    const tagInfo = tagInfoMap[key]\n    if (tagInfo.re.test(title)) {\n      tag = key\n      symbol = tagInfo.symbol\n      break\n    }\n  }\n\n  if (tag) {\n    item.json.tag = tag\n    item.json.tgTitle = `${symbol} ${title} #douban #${tag}`\n    newItems.push(item)\n  }\n}\n\nreturn newItems"
+      },
+      "name": "Function filter",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        840,
+        600
+      ],
+      "id": "090d339e-efae-4320-88d7-4933e9ba56d5"
+    }
+  ],
+  "connections": {
+    "RSS Feed Read": {
+      "main": [
+        [
+          {
+            "node": "Function filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interval": {
+      "main": [
+        [
+          {
+            "node": "RSS Feed Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function filter": {
+      "main": [
+        [
+          {
+            "node": "Function",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-09-11T01:32:40.941Z",
+  "updatedAt": "2022-11-06T05:15:13.970Z",
+  "settings": {},
+  "staticData": {
+    "global": {}
+  }
+}

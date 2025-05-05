@@ -1,0 +1,192 @@
+{
+  "active": false,
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-09-05T02:54:57.859Z",
+  "id": "Le1DYjEyccgE9Pwl",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "154fb9cd-3368-404d-8247-fa3eab17a1df",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        680,
+        140
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "3f5d33c9-f409-41c9-91c4-7947743c4e2d",
+              "leftValue": "asd",
+              "rightValue": "asd",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ac6cdbbc-25e5-4a7c-a971-8b080bc89899",
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [
+        700,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "url": "asasdasdasd",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "asd",
+              "value": "asd"
+            },
+            {
+              "name": "={{ $json.teste }}",
+              "value": "asd"
+            },
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "id": "247aff64-222d-4f31-ac8c-2dc824107941",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1020,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "path": "asdasdasdasdasd",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "id": "8f05018e-632e-46a1-83f6-2506cba35e69",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        340,
+        340
+      ],
+      "webhookId": "b77f6b0d-615e-4dcd-8b31-698462cad213",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "eDGGJMJBgG0lvaxW",
+          "name": "ZendeskConversationApiAccount"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "createdAt": "2024-09-05T02:54:57.859Z",
+      "updatedAt": "2024-09-05T02:54:57.859Z",
+      "role": "workflow:owner",
+      "workflowId": "Le1DYjEyccgE9Pwl",
+      "projectId": "BbalulLcG5rqgvFJ",
+      "project": {
+        "createdAt": "2024-06-10T18:18:03.245Z",
+        "updatedAt": "2024-06-10T18:18:03.245Z",
+        "id": "BbalulLcG5rqgvFJ",
+        "name": "MALCON VIVARELLI SILVA <mvsilva@padtec.com.br>",
+        "type": "personal",
+        "icon": null,
+        "projectRelations": [
+          {
+            "createdAt": "2024-06-10T18:18:03.245Z",
+            "updatedAt": "2024-06-10T18:18:03.245Z",
+            "role": "project:personalOwner",
+            "userId": "a9909e32-26ff-472d-956b-0d491ff8ae04",
+            "projectId": "BbalulLcG5rqgvFJ",
+            "user": {
+              "createdAt": "2024-05-31T19:30:31.891Z",
+              "updatedAt": "2024-08-08T16:46:15.990Z",
+              "id": "a9909e32-26ff-472d-956b-0d491ff8ae04",
+              "email": "mvsilva@padtec.com.br",
+              "firstName": "MALCON VIVARELLI",
+              "lastName": "SILVA",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2024-05-31T19:31:18.544Z",
+                "personalization_survey_n8n_version": "1.42.1"
+              },
+              "settings": {
+                "isOnboarded": true,
+                "userActivated": true,
+                "userActivatedAt": 1721678428499,
+                "firstSuccessfulWorkflowId": "uJYj0C8HAGSVdduN",
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1723135580263
+                }
+              },
+              "role": "global:owner",
+              "disabled": false,
+              "mfaEnabled": false,
+              "isPending": false,
+              "isOwner": true
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-09-05T02:55:01.051Z",
+  "versionId": "cdd17bec-5468-4d1e-bace-ba1a4b005d5c"
+}

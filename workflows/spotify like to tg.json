@@ -1,0 +1,129 @@
+{
+  "id": 2,
+  "name": "spotify like to tg",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "4d50059f-9b6e-444e-8b28-3a824725f813",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        440,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "library",
+        "limit": 10
+      },
+      "name": "Get liked tracks",
+      "type": "n8n-nodes-base.spotify",
+      "position": [
+        680,
+        440
+      ],
+      "typeVersion": 1,
+      "id": "2da39c10-9cb3-4b82-924f-9ca303d8dad2",
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "13",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\nconst lastItemId = staticData.lastItemId;\n\nconsole.log('lastItemId', lastItemId);\nconst firstItem = items[0];\nlet newItems = [];\n\nfunction getId(item) {\n  return item.json.track.id;\n}\n\nif (lastItemId) {\n  for (const item of items) {\n    if (getId(item) === lastItemId) {\n      break;\n    }\n    newItems.push(item)\n  }\n} else {\n  newItems = [firstItem]\n}\n\nstaticData.lastItemId = getId(firstItem)\nreturn newItems.reverse()"
+      },
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        900,
+        440
+      ],
+      "id": "4e02dd7d-e122-44fb-a7e3-6f13355f377f"
+    },
+    {
+      "parameters": {
+        "chatId": "@reorx_share",
+        "text": "=🎵 <u>{{$json[\"track\"][\"name\"]}}</u> by <em>{{$json[\"track\"][\"artists\"][0][\"name\"]}}</em> #music #spotify\n\nhttps://open.spotify.com/track/{{$json[\"track\"][\"id\"]}}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        440
+      ],
+      "id": "5adf1cff-b04a-4d37-956f-ffdf71118c65",
+      "credentials": {
+        "telegramApi": {
+          "id": "8",
+          "name": "Telegram reorx_share_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "interval": 15,
+        "unit": "minutes"
+      },
+      "name": "Interval",
+      "type": "n8n-nodes-base.interval",
+      "typeVersion": 1,
+      "position": [
+        440,
+        660
+      ],
+      "id": "2c8cdb08-4a8b-4d34-81ef-e414451dd6ac"
+    }
+  ],
+  "connections": {
+    "Get liked tracks": {
+      "main": [
+        [
+          {
+            "node": "Function",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interval": {
+      "main": [
+        [
+          {
+            "node": "Get liked tracks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2022-09-11T00:47:07.614Z",
+  "updatedAt": "2022-11-25T23:12:14.181Z",
+  "settings": {},
+  "staticData": {
+    "global": {}
+  }
+}
